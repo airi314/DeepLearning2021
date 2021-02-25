@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 def scale(X):
     return (X-np.mean(X, 0))/np.std(X, 0)
 
