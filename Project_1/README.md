@@ -1,4 +1,3 @@
-aaa
 # Project 1
 
 **Topic**: Multilayer perceptron (MLP) employing backpropagation algorithm
