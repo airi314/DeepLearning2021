@@ -1,6 +1,7 @@
 # Project 1
 
-**Topic**: Multilayer perceptron (MLP) employing backpropagation algorithm
+## Topic
+Multilayer perceptron (MLP) employing backpropagation algorithm
 
 ## Datasets
 
@@ -19,16 +20,16 @@
   * learning rate
   * momentum
   * problem type: classification or regression
-• during the project presentation - training and testing implemented network on new (unseen before) datasets
-• reproducibility by initializing a random number generator with a constant seed
+* during the project presentation - training and testing implemented network on new (unseen before) datasets
+* reproducibility by initializing a random number generator with a constant seed
 * ploting training and test error
 * tracking learning process iteration by iteration (visualization of edges’ weights) as well as a propagated error (visualization of an error on each edge)
 * visualization of a training set and classification/regression result (as a background)
 
 ## Elements to analyze
 * How does activation function affect the model’s accuracy? Experimenting with sigmoid and two other activation functions. The activation function in an output layer should be chosen accordingly to the problem.
-• How does the number of hidden layers and number of neurons in hidden layers impact the model’s accuracy? Analizing different architectures.
-• How does the loss function affect the model’s accuracy? Considering two different loss functions for both classification and regression.
+* How does the number of hidden layers and number of neurons in hidden layers impact the model’s accuracy? Analizing different architectures.
+* How does the loss function affect the model’s accuracy? Considering two different loss functions for both classification and regression.
 
 ## Timetable
 
