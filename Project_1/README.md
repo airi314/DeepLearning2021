@@ -1,5 +1,14 @@
 # Project 1
 
+## Work progress
+
+### TO-DO
+* tracking learning process iteration by iteration (visualization of edges’ weights) as well as a propagated error (visualization of an error on each edge)
+* visualization of a training set and classification/regression result (as a background)
+* two different loss functions for both classification and regression
+* maybe stop condition
+* test on MNIST dataset
+
 ## Topic
 Multilayer perceptron (MLP) employing backpropagation algorithm
 
