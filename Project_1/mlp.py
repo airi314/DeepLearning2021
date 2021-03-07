@@ -1,82 +1,144 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from activation import sigmoid
-from utils import scale, shuffle_data, split_batches
-from evaluation import MSE
+from activation import *
+from utils import one_hot_encode, shuffle_data, split_batches
+from layer import Layer
+from evaluation import *
 
 class MLP:
-    def __init__(self, layers, act_fn, batch_size, epoq, eta=0.01, alpha=0.9, bias=True, regression=True):
-        '''
-        layers - a list of int-s, i-th place corresponds to i-th layer size, including input and output layers
-        epoq - # of epoques
-        eta - learning rate
-        alpha - momentum rate, when equal to 0 it's inactive
-        bias, regression take boolean values
-        '''
-        self.af = act_fn
-        self.bias = bias
-        self.bs = batch_size
-        self.epoq = epoq
-        self.eta = eta
-        self.alpha = alpha
+    def __init__(self, hidden_layers, activ_function=sigmoid, batch_size=32, 
+                 init="Xavier", bias_presence=True, regression=True, 
+                 eta = 0.01, alpha = 0, max_epochs = 500, epochs_no_change = 20,
+                 random_state = 123):
+        """
+        Multi-layer Perceptron classifier.
+        
+        Parameters
+        ----------
+        layers : list of intl; length = n_layers - 2
+            i-th place corresponds to i-th hidden layer size
+            
+        activ_function : {linear, sigmoid, tanh, relu}, default=sigmoid
+            Ativation function for hidden layers. 
+        
+        batch_size : int 
+            Size of the batch during the training
+        
+        init : {'uniform', 'linear', 'Xavier' 'He'}, default='Xavier' 
+            Method of weights initialization
+        
+        bias_presence : boolean; default: True 
+            If bias is present in the training process
+        
+        regression : boolean; default: True
+            If problem is regression problem or not
+        
+        eta : float, default: 0.01 
+            Learning rate
+        
+        alpha : float, default: 0
+            Momentum for gradient descent update; should be between 0 and 1; if 0 then inactivate
+        
+        max_epochs : int; default: 500 
+            Maximum number of epochs
+        
+        epochs_no_change : int; default: 20 
+            Maximum number of epochs with no improvement
+        
+        random_state : int; default: 123
+            Random state using during training
+        
+        """
+        
+        self.random_state = random_state
+        self.hidden_layers = hidden_layers
+        self.activ_function = activ_function
+        self.init = init
+        self.bias_presence = bias_presence
+        self.initialized = False
+            
+        self.batch_size = batch_size
         self.regr = regression
         
-        # initialize weights randomly
-        if self.bias:
-            self.W = [np.random.rand(layers[i-1]+1, layers[i]) for i in range(1, len(layers))]
+        if self.regr:
+            self.last_activ = linear
         else:
-            self.W = [np.random.rand(layers[i-1], layers[i]) for i in range(1, len(layers))]
+            self.last_activ = softmax
         
-        # derivatives of weights
-        self.dW = [np.zeros_like(w) for w in self.W]
+        self.eta = eta
+        self.alpha = alpha
         
-        # momentum
-        self.mW = [np.zeros_like(w) for w in self.W]
-        
+        self.max_epochs = max_epochs
+        self.epochs_no_change = epochs_no_change
     
-    def forward(self, x): 
-        z = [0]*len(self.W)
-        for i in range(len(self.W)):
-            z[i] = np.c_[x, np.ones(x.shape[0])] @ self.W[i]
-            x = self.af(z[i])    
-        return z
-    
-    
-    def backprop(self, x, y):
-        for j in range(self.epoq):
-            x, y = shuffle_data(x, y)
-            batch_x, batch_y = split_batches(x, y, self.bs)
-            
-            for b_x, b_y in zip(batch_x, batch_y):
-                z = self.forward(b_x)
-                e = z[-1] - b_y
-                for i in reversed(range(len(self.W)-1)):
-                    self.dW[i+1] = (np.c_[self.af(z[i]), np.ones(z[i].shape[0])].T @ e)/z[i].shape[0]
-                    if i != 0:
-                        e =  e @ self.W[i+1][:-1,:].T * self.af(z[i], True)
-                        
-                for i in range(len(self.W)):
-                    self.mW[i] = self.alpha * self.mW[i] + (1-self.alpha) * self.dW[i]
-                    self.W[i] -= self.eta * self.mW[i]
-                        
-    # to do: classification, forward and backprop without bias
-    # can we assume last hidden layer has sigmoid activation function always? That allows for e = z[-1] - b_y
+    def create_layers(self, neurons_x, neurons_y):
         
-from numpy import genfromtxt
+        self.layers = []
+        self.neurons = [neurons_x] + self.hidden_layers + [neurons_y]
+        
+        for i in range(len(self.neurons)-2):
+            self.layers.append(Layer(self.neurons[i], self.neurons[i+1], 
+                                     self.activ_function, self.random_state, self.init, self.bias_presence))
+        self.layers.append(Layer(self.neurons[i+1], self.neurons[i+2], 
+                                 self.last_activ, self.random_state, self.init, self.bias_presence))
+        self.initialized = True
 
-# import train data
-path = '/Users/Gonia_Wachulec/Desktop/Python/MIO/mio1/regression/square-simple-training.csv'
-data = scale(np.genfromtxt(path, delimiter=',')[1:, 1:])
-X_train = data[:,0].reshape(-1,1)
-Y_train = data[:,1].reshape(-1,1)
 
-# import test data
-path = '/Users/Gonia_Wachulec/Desktop/Python/MIO/mio1/regression/square-simple-test.csv'
-data = scale(np.genfromtxt(path, delimiter=',')[1:, 1:])
-X_test = data[:,0].reshape(-1,1)
-Y_test = data[:,1].reshape(-1,1)
+    def forward(self, x):
+        self.z = [0]*len(self.layers)
+        x = x.T
+        for i, layer in enumerate(self.layers):
+            x = layer.forward(x)
+            self.z[i] = x
+        return x.T
 
-mlp = MLP([1,10,1],sigmoid,1,10000)
-mlp.backprop(X_train,Y_train)
-pred = mlp.forward(X_test)[-1]
-print("MSE on test set: " + str(MSE(Y_test,pred)))
+    def backpropagate(self, x, y):
+
+        x, y = shuffle_data(x, y, self.random_state)
+        batch_x, batch_y = split_batches(x, y, self.batch_size)
+
+        for b_x, b_y in zip(batch_x, batch_y):
+            self.backpropagate_batch(b_x, b_y)
+    
+    def backpropagate_batch(self, x, y):
+        z = self.forward(x)
+        error_weight = z.T - y.T
+        self.layers[-1].backpropagate_last_layer(error_weight)
+        for i in range(len(self.layers)-2, -1, -1):
+            error_weight = self.layers[i+1].error_weight()
+            self.layers[i].backpropagate_layer(error_weight)
+        self.update_weights(x)
+
+    def update_weights(self, x):
+        self.layers[0].update_weights(x.T, self.eta, self.alpha)
+        for i, layer in enumerate(self.layers[1:]):
+            layer.update_weights(self.z[i], self.eta, self.alpha)
+         
+    def measure_performance(self, y, y_pred):
+        
+        if self.regr:
+            self.errors.append(MSE(y_pred, y))
+        else:
+            y_pred = np.argmax(y_pred, axis=1)
+            self.errors.append(accuracy(y_pred, self.y_before_encoding))
+    
+    def fit(self, x, y):
+    
+        if not self.regr:
+            self.y_before_encoding = y
+            y = one_hot_encode(y)
+        
+        self.create_layers(x.shape[1], y.shape[1])
+
+        self.errors = []
+        y_pred = self.forward(x)
+        self.measure_performance(y, y_pred)
+        
+        for i in range(self.max_epochs):
+            self.backpropagate(x, y)
+            y_pred = self.forward(x)
+            self.measure_performance(y, y_pred)
+    
+    def predict(self, x, predict_proba = False):
+        y_pred = self.forward(x)
+        if not self.regr and not predict_proba:
+            y_pred = np.argmax(y_pred, axis=1)
+        return y_pred
