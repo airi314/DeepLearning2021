@@ -25,16 +25,17 @@ x = scale(x)
 x_test = scale(x_test)
 
 # %%
-plot_2d_data(x, y)
+plot_2d_data(x, y, "Training data")
 
 # %%
 network = MLP([30], sigmoid, init= 'Xavier', bias_presence = True, eta=0.01, 
-              alpha=0.9, max_epochs=100, regression=True)
+              alpha=0.9, max_epochs=100, regression=False)
 
 # %%
 network.fit(x,y)
 
 # %%
-accuracy(network.predict(x_test), y_test)
+print("Accuracy: " + str(accuracy(network.predict(x_test), y_test)))
 
 # %%
+plot_2d_data(x_test, network.predict(x_test), "Prediction on test data")

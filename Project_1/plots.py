@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_2d_data(x, y):
+def plot_2d_data(x, y, plot_title = "Figure 1"):
     plt.figure()
     uniques = np.unique(y[:, 0])
     colors = ['r', 'g', 'b']
@@ -12,6 +12,7 @@ def plot_2d_data(x, y):
         plt.plot(ax, ay, colors[i] + 'o')
         legend.append('class ' + str(int(uniques[i])))
     plt.legend(legend)
+    plt.title(plot_title)
     plt.show()
 
 def plot_errors(errors, labels=[]):

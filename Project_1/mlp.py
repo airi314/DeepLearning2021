@@ -13,7 +13,7 @@ class MLP:
         
         Parameters
         ----------
-        layers : list of intl; length = n_layers - 2
+        hidden_layers : list of intl; length = n_layers - 2
             i-th place corresponds to i-th hidden layer size
             
         activ_function : {linear, sigmoid, tanh, relu}, default=sigmoid
@@ -141,4 +141,5 @@ class MLP:
         y_pred = self.forward(x)
         if not self.regr and not predict_proba:
             y_pred = np.argmax(y_pred, axis=1)
+            y_pred = y_pred.reshape([-1,1])
         return y_pred
