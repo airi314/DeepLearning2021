@@ -112,19 +112,23 @@ class MLP:
         for i, layer in enumerate(self.layers[1:]):
             layer.update_weights(self.z[i], self.eta, self.alpha)
          
-    def measure_performance(self, y, y_pred, mae=False, acc=False, hinge=False):
+    def measure_performance(self, y, y_pred, y_test, y_test_pred, mae=False, acc=False, hinge=False):
         if self.regr and mae:
             self.errors.append(MAE(y_pred, y))
+            self.errors_test.append(MAE(y_test_pred, y_test))
         elif self.regr:
             self.errors.append(MSE(y_pred, y))
+            self.errors_test.append(MSE(y_pred, y))
         elif acc:
             self.errors.append(accuracy(y_pred, self.y_before_encoding))
+            self.errors_test.append(accuracy(y_pred, self.y_before_encoding))
         elif hinge:
             self.errors.append(hinge_loss(y_pred, self.y_before_encoding))
         else:
             self.errors.append(cat_cross_entropy(y_pred, y))
+            self.errors_test.append(cat_cross_entropy(y_pred, y))
     
-    def fit(self, x, y):
+    def fit(self, x, y, x_test, y_test):
     
         if not self.regr:
             self.y_before_encoding = y
@@ -133,13 +137,16 @@ class MLP:
         self.create_layers(x.shape[1], y.shape[1])
 
         self.errors = []
+        self.errors_test = []
         y_pred = self.forward(x)
-        self.measure_performance(y, y_pred)
+        y_test_pred = self.forward(x_test)
+        self.measure_performance(y, y_pred, y_test, y_test_pred)
         
         for i in range(self.max_epochs):
             self.backpropagate(x, y)
             y_pred = self.forward(x)
-            self.measure_performance(y, y_pred)
+            y_test_pred = self.forward(x_test)
+            self.measure_performance(y, y_pred, y_test, y_test_pred)
     
     def predict(self, x, predict_proba = False):
         y_pred = self.forward(x)
