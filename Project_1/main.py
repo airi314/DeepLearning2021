@@ -28,14 +28,17 @@ x_test = scale(x_test)
 plot_2d_data(x, y, "Training data")
 
 # %%
-network = MLP([30], sigmoid, init= 'Xavier', bias_presence = True, eta=0.01, 
+network = MLP([20], sigmoid, init= 'Xavier', bias_presence = True, eta=0.01,
               alpha=0.9, max_epochs=100, regression=False)
 
 # %%
 network.fit(x,y)
-
-# %%
-print("Accuracy: " + str(accuracy(network.predict(x_test), y_test)))
+plot_errors_vs_epochs(network.errors, "Cross-entropy")
 
 # %%
 plot_2d_data(x_test, network.predict(x_test), "Prediction on test data")
+print("Accuracy on test data: " + str(accuracy(network.predict(x_test, predict_proba=True), y_test)))
+
+
+
+

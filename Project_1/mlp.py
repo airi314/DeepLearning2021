@@ -112,13 +112,17 @@ class MLP:
         for i, layer in enumerate(self.layers[1:]):
             layer.update_weights(self.z[i], self.eta, self.alpha)
          
-    def measure_performance(self, y, y_pred):
-        
-        if self.regr:
+    def measure_performance(self, y, y_pred, mae=False, acc=False, hinge=False):
+        if self.regr and mae:
+            self.errors.append(MAE(y_pred, y))
+        elif self.regr:
             self.errors.append(MSE(y_pred, y))
-        else:
-            y_pred = np.argmax(y_pred, axis=1)
+        elif acc:
             self.errors.append(accuracy(y_pred, self.y_before_encoding))
+        elif hinge:
+            self.errors.append(hinge_loss(y_pred, self.y_before_encoding))
+        else:
+            self.errors.append(cat_cross_entropy(y_pred, y))
     
     def fit(self, x, y):
     
