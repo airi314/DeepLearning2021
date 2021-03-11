@@ -112,7 +112,7 @@ class MLP:
         for i, layer in enumerate(self.layers[1:]):
             layer.update_weights(self.z[i], self.eta, self.alpha)
          
-    def measure_performance(self, y, y_pred, y_test, y_test_pred, mae=False, acc=False, hinge=False):
+    def measure_performance(self, y, y_pred, y_test, y_test_pred, mae=False, acc=False, kl=False):
         if self.regr and mae:
             self.errors.append(MAE(y_pred, y))
             self.errors_test.append(MAE(y_test_pred, y_test))
@@ -122,8 +122,9 @@ class MLP:
         elif acc:
             self.errors.append(accuracy(y_pred, self.y_before_encoding))
             self.errors_test.append(accuracy(y_pred, self.y_before_encoding))
-        elif hinge:
-            self.errors.append(hinge_loss(y_pred, self.y_before_encoding))
+        elif kl:
+            self.errors.append(kl_divergence(y_pred, y))
+            self.errors_test.append(kl_divergence(y_pred, y))
         else:
             self.errors.append(cat_cross_entropy(y_pred, y))
             self.errors_test.append(cat_cross_entropy(y_pred, y))
