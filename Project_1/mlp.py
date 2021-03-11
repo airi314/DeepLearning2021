@@ -2,6 +2,7 @@ from activation import *
 from utils import one_hot_encode, shuffle_data, split_batches
 from layer import Layer
 from evaluation import *
+from plots import plot_architecture
 
 class MLP:
     def __init__(self, hidden_layers, activ_function=sigmoid, batch_size=32, 
@@ -129,7 +130,7 @@ class MLP:
             self.errors.append(cat_cross_entropy(y_pred, y))
             self.errors_test.append(cat_cross_entropy(y_pred, y))
     
-    def fit(self, x, y, x_test, y_test):
+    def fit(self, x, y, x_test, y_test, plot_arch=False):
     
         if not self.regr:
             self.y_before_encoding = y
@@ -148,6 +149,8 @@ class MLP:
             y_pred = self.forward(x)
             y_test_pred = self.forward(x_test)
             self.measure_performance(y, y_pred, y_test, y_test_pred)
+            if plot_arch:
+                plot_architecture(self.neurons, [l.W.T for l in self.layers])
     
     def predict(self, x, predict_proba = False):
         y_pred = self.forward(x)

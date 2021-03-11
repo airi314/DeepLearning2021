@@ -202,7 +202,6 @@ class DrawNN():
                 tempArr = np.ones((first, second)) * 0.4
                 weights_list.append(tempArr)
             self.weights_list = weights_list
-        print(self.weights_list)
 
     def draw(self):
         widest_layer = max(self.neural_network)
