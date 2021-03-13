@@ -2,7 +2,7 @@ from activation import *
 from utils import one_hot_encode, shuffle_data, split_batches
 from layer import Layer
 from evaluation import measure_performance
-from plots import plot_architecture
+from plots import plot_architecture, plot_errors_vs_epochs
 
 
 class MLP:
@@ -135,7 +135,7 @@ class MLP:
         else:
             self.count_no_change += 1
 
-    def fit(self, x, y, plot_arch=False, measure=None, evaluation_dataset = None):
+    def fit(self, x, y, measure=None, evaluation_dataset=None, plot_arch=False, plot_errors=True):
 
         self.measure = measure
         self.errors = []
@@ -168,6 +168,8 @@ class MLP:
                 print('Stop training process. ' +
                       str(self.epochs_no_change) + ' epochs with no improvement.')
                 break
+
+        plot_errors_vs_epochs(self.errors, self.errors_test, self.measure)
 
     def predict(self, x, predict_proba=False):
         y_pred = self.__forward(x)

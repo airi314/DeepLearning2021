@@ -18,24 +18,19 @@ def plot_2d_data(x, y, plot_title="Figure 1"):
     plt.show()
 
 
-def plot_errors(errors, labels=[]):
-    print(len(errors))
-    colors = ['black', 'red', 'green', 'blue', 'yellow']
-    plt.figure()
-    for i, exp in enumerate(errors):
-        plt.plot(exp, colors[i])
-    legend = labels
-    plt.legend(legend)
-    plt.show()
-
-
 def plot_errors_vs_epochs(errors, errors_test, measure_name):
     plt.figure()
     x = [x for x in range(len(errors))]
     plt.plot(x, errors, 'red')
-    plt.plot(x, errors_test, 'blue')
-    plt.title(measure_name + " change on training and test sets during learning")
-    plt.legend(["training set", "test set"])
+
+    if errors_test:
+        plt.plot(x, errors_test, 'blue')
+        plt.title(measure_name +
+                  " change on training and test sets during learning")
+        plt.legend(["training set", "test set"])
+    else:
+        plt.title(measure_name + " change on training set during learning")
+
     plt.xlabel("Epochs")
     plt.ylabel(measure_name)
     plt.show()
