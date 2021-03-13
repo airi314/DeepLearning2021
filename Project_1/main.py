@@ -16,7 +16,7 @@ from mlp import MLP
 
 # %%
 train = read_data('data/data.simple.train.10000.csv', classification=True)
-x,y = split_data(train, 2)
+x, y = split_data(train, 2)
 test = read_data('data/data.simple.test.10000.csv', classification=True)
 x_test, y_test = split_data(test, 2)
 y = y - [1]
@@ -28,24 +28,28 @@ x_test = scale(x_test)
 # plot_2d_data(x, y, "Training data")
 
 # %%
-network = MLP([20], sigmoid, init= 'Xavier', bias_presence = True, eta=0.01,
-              alpha=0.9, max_epochs=10, regression=False)
+network = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
+              alpha=0.9, max_epochs=1000, regression=False, random_state=1)
 
 # %%
-network.fit(x,y, x_test, y_test, plot_arch=True)
+network.fit(x, y, plot_arch=False)
 # plot_errors_vs_epochs(network.errors, network.errors_test, "Cross-entropy")
 # plot_2d_error(x_test, y_test, network.predict(x_test))
 
+print(network.errors)
+print(network.errors_test)
+
+
 # %%
 # plot_2d_data(x_test, network.predict(x_test), "Prediction on test data")
-print("Accuracy on test data: " + str(accuracy(network.predict(x_test, predict_proba=True), y_test)))
+#print("Accuracy on test data: " + str(accuracy(network.predict(x_test, predict_proba=True), y_test)))
 
 # %%
 # plot_architecture(network.neurons, [l.W.T for l in network.layers])
 
 # %%
-print("Weight shapes for each layer")
-print([np.shape(l.W.T) for l in network.layers])
-print("Error shapes for each layer")
-print([np.shape(l.backward_error.T) for l in network.layers])
+#print("Weight shapes for each layer")
+#print([np.shape(l.W.T) for l in network.layers])
+#print("Error shapes for each layer")
+#print([np.shape(l.backward_error.T) for l in network.layers])
 # plot_architecture(network.neurons, [l.backward_error.T for l in network.layers])

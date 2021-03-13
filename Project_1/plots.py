@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import VisualizeNN as VisNN
 
-def plot_2d_data(x, y, plot_title = "Figure 1"):
+
+def plot_2d_data(x, y, plot_title="Figure 1"):
     plt.figure()
     uniques = np.unique(y[:, 0])
     colors = ['r', 'g', 'b']
@@ -16,6 +17,7 @@ def plot_2d_data(x, y, plot_title = "Figure 1"):
     plt.title(plot_title)
     plt.show()
 
+
 def plot_errors(errors, labels=[]):
     print(len(errors))
     colors = ['black', 'red', 'green', 'blue', 'yellow']
@@ -25,7 +27,8 @@ def plot_errors(errors, labels=[]):
     legend = labels
     plt.legend(legend)
     plt.show()
-    
+
+
 def plot_errors_vs_epochs(errors, errors_test, measure_name):
     plt.figure()
     x = [x for x in range(len(errors))]
@@ -36,6 +39,7 @@ def plot_errors_vs_epochs(errors, errors_test, measure_name):
     plt.xlabel("Epochs")
     plt.ylabel(measure_name)
     plt.show()
+
 
 def plot_2d_error(x, y, pred):
     plt.figure()
@@ -49,6 +53,7 @@ def plot_2d_error(x, y, pred):
     plt.legend(['Classified correctly', 'Classified incorrectly'])
     plt.title("Misclassified observations")
     plt.show()
+
 
 def plot_architecture(neurons, weights):
     architect = VisNN.DrawNN(neurons, weights)
