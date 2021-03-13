@@ -11,14 +11,14 @@ class Layer:
         self.af = activ_function
         self.bias_presence = bias_presence
 
-        self.W = self.init_weights(neurons_in, neurons_out, random_state, init)
+        self.W = self.__init_weights(neurons_in, neurons_out, random_state, init)
         self.mW = np.zeros([neurons_out, neurons_in])
 
         if self.bias_presence:
-            self.bias = self.init_weights(1, neurons_out, random_state, init)
+            self.bias = self.__init_weights(1, neurons_out, random_state, init)
             self.m_bias = np.zeros([neurons_out, 1])
 
-    def init_weights(self, neurons_in, neurons_out, random_state, init):
+    def __init_weights(self, neurons_in, neurons_out, random_state, init):
         r = np.random.RandomState(random_state)
 
         if init == 'zeros':

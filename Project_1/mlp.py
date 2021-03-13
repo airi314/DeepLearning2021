@@ -69,7 +69,7 @@ class MLP:
         self.epochs_no_change = epochs_no_change
         self.min_improvement = min_improvement
 
-    def create_layers(self, neurons_x, neurons_y):
+    def __create_layers(self, neurons_x, neurons_y):
 
         self.layers = []
         self.neurons = [neurons_x] + self.hidden_layers + [neurons_y]
@@ -81,7 +81,7 @@ class MLP:
                                  self.last_activ, self.random_state, self.init, self.bias_presence))
         self.initialized = True
 
-    def forward(self, x):
+    def __forward(self, x):
         self.z = [0]*len(self.layers)
         x = x.T
         for i, layer in enumerate(self.layers):
@@ -89,29 +89,29 @@ class MLP:
             self.z[i] = x
         return x.T
 
-    def backpropagate(self, x, y):
+    def __backpropagate(self, x, y):
 
         x, y = shuffle_data(x, y, self.random_state)
         batch_x, batch_y = split_batches(x, y, self.batch_size)
 
         for b_x, b_y in zip(batch_x, batch_y):
-            self.backpropagate_batch(b_x, b_y)
+            self.__backpropagate_batch(b_x, b_y)
 
-    def backpropagate_batch(self, x, y):
-        z = self.forward(x)
+    def __backpropagate_batch(self, x, y):
+        z = self.__forward(x)
         error_weight = z.T - y.T
         self.layers[-1].backpropagate_last_layer(error_weight)
         for i in range(len(self.layers)-2, -1, -1):
             error_weight = self.layers[i+1].error_weight()
             self.layers[i].backpropagate_layer(error_weight)
-        self.update_weights(x)
+        self.__update_weights(x)
 
-    def update_weights(self, x):
+    def __update_weights(self, x):
         self.layers[0].update_weights(x.T, self.eta, self.alpha)
         for i, layer in enumerate(self.layers[1:]):
             layer.update_weights(self.z[i], self.eta, self.alpha)
 
-    def compute_errors(self, x, y, x_test, y_test):
+    def __compute_errors(self, x, y, evaluation_dataset):
 
         if self.regr:
             self.measure = "MSE" if self.measure is None else self.measure
@@ -120,12 +120,13 @@ class MLP:
             self.measure = "accuracy" if self.measure is None else self.measure
             self.best_error = 0 if self.best_error is None else self.best_error
 
-        y_pred = self.forward(x)
+        y_pred = self.__forward(x)
         train_error = measure_performance(y_pred, y, self.regr, self.measure)
         self.errors.append(train_error)
 
-        if hasattr(x_test, 'shape') and hasattr(x_test, 'shape'):
-            y_test_pred = self.forward(x_test)
+        if evaluation_dataset:
+            x_test, y_test = evaluation_dataset
+            y_test_pred = self.__forward(x_test)
             self.errors_test.append(measure_performance(
                 y_test_pred, y_test, self.regr, self.measure))
 
@@ -134,7 +135,7 @@ class MLP:
         else:
             self.count_no_change += 1
 
-    def fit(self, x, y, x_test=None, y_test=None, plot_arch=False, measure=None):
+    def fit(self, x, y, plot_arch=False, measure=None, evaluation_dataset = None):
 
         self.measure = measure
         self.errors = []
@@ -145,20 +146,20 @@ class MLP:
         if not self.regr:
             y = one_hot_encode(y)
 
-        if not self.regr and hasattr(y_test, 'shape'):
-            y_test = one_hot_encode(y_test)
+        if not self.regr and evaluation_dataset:
+            evaluation_dataset[1] = one_hot_encode(evaluation_dataset[1])
 
         if self.measure is None and self.regr:
             self.measure = "MSE"
         elif self.measure is None:
             self.measure = "accuracy"
 
-        self.create_layers(x.shape[1], y.shape[1])
-        self.compute_errors(x, y, x_test, y_test)
+        self.__create_layers(x.shape[1], y.shape[1])
+        self.__compute_errors(x, y, evaluation_dataset)
 
         for i in range(self.max_epochs):
-            self.backpropagate(x, y)
-            self.compute_errors(x, y, x_test, y_test)
+            self.__backpropagate(x, y)
+            self.__compute_errors(x, y, evaluation_dataset)
 
             if plot_arch:
                 plot_architecture(self.neurons, [l.W.T for l in self.layers])
@@ -169,7 +170,7 @@ class MLP:
                 break
 
     def predict(self, x, predict_proba=False):
-        y_pred = self.forward(x)
+        y_pred = self.__forward(x)
         if not self.regr and not predict_proba:
             y_pred = np.argmax(y_pred, axis=1)
             y_pred = y_pred.reshape([-1, 1])
