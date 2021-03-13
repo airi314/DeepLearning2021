@@ -29,10 +29,11 @@ x_test = scale(x_test)
 
 # %%
 network = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
-              alpha=0.9, max_epochs=1000, regression=False, random_state=1)
+              alpha=0.9, max_epochs=4, regression=False, random_state=1)
 
 # %%
-network.fit(x, y, plot_arch=False, evaluation_dataset=[x_test, y_test])
+network.fit(x, y, plot_arch=False, plot_errors_arch=True,
+            evaluation_dataset=[x_test, y_test])
 # plot_errors_vs_epochs(network.errors, network.errors_test, "Cross-entropy")
 # plot_2d_error(x_test, y_test, network.predict(x_test))
 

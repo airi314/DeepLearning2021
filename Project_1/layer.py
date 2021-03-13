@@ -1,5 +1,6 @@
 import numpy as np
 from activation import *
+from copy import deepcopy
 
 
 class Layer:
@@ -14,6 +15,8 @@ class Layer:
         self.W = self.__init_weights(
             neurons_in, neurons_out, random_state, init)
         self.mW = np.zeros([neurons_out, neurons_in])
+        self.prev_W = self.__init_weights(
+            1, neurons_out, random_state, 'zeros')
 
         if self.bias_presence:
             self.bias = self.__init_weights(1, neurons_out, random_state, init)

@@ -3,6 +3,7 @@ from utils import one_hot_encode, shuffle_data, split_batches
 from layer import Layer
 from evaluation import measure_performance
 from plots import plot_architecture, plot_errors_vs_epochs
+from copy import deepcopy
 
 
 class MLP:
@@ -94,8 +95,13 @@ class MLP:
         x, y = shuffle_data(x, y, self.random_state)
         batch_x, batch_y = split_batches(x, y, self.batch_size)
 
+        self.__save_weights()
         for b_x, b_y in zip(batch_x, batch_y):
             self.__backpropagate_batch(b_x, b_y)
+
+    def __save_weights(self):
+        for i in range(len(self.layers)-1, -1, -1):
+            self.layers[i].prev_W = deepcopy(self.layers[i].W)
 
     def __backpropagate_batch(self, x, y):
         z = self.__forward(x)
@@ -115,7 +121,7 @@ class MLP:
 
         if self.regr:
             self.measure = "MSE" if self.measure is None else self.measure
-            self.best_error = 0 if self.best_error is None else self.best_error
+            self.best_error = np.inf if self.best_error is None else self.best_error
         else:
             self.measure = "accuracy" if self.measure is None else self.measure
             self.best_error = 0 if self.best_error is None else self.best_error
@@ -132,10 +138,11 @@ class MLP:
 
         if (self.regr and train_error < self.best_error - self.min_improvement) or (not self.regr and train_error > self.best_error + self.min_improvement):
             self.best_error = train_error
+            self.count_no_change = 0
         else:
             self.count_no_change += 1
 
-    def fit(self, x, y, measure=None, evaluation_dataset=None, plot_arch=False, plot_errors=True):
+    def fit(self, x, y, measure=None, evaluation_dataset=None, plot_errors=True, plot_arch=False, plot_errors_arch=False):
 
         self.measure = measure
         self.errors = []
@@ -163,6 +170,10 @@ class MLP:
 
             if plot_arch:
                 plot_architecture(self.neurons, [l.W.T for l in self.layers])
+
+            if plot_errors_arch:
+                plot_architecture(
+                    self.neurons, [l.W.T - l.prev_W.T for l in self.layers])
 
             if self.count_no_change > self.epochs_no_change:
                 print('Stop training process. ' +
