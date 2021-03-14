@@ -167,7 +167,7 @@ class NeuralNetwork():
                       self.number_of_neurons_in_widest_layer)
         self.layers.append(layer)
 
-    def draw(self, weights_list=None):
+    def draw(self, weights_list=None, errors=False):
         # vertical_distance_between_layers and horizontal_distance_between_neurons are the same with the variables of the same name in layer class
         vertical_distance_between_layers = 6
         horizontal_distance_between_neurons = 2
@@ -192,7 +192,10 @@ class NeuralNetwork():
 
         pyplot.axis('scaled')
         pyplot.axis('off')
-        pyplot.title('Neural Network architecture', fontsize=15)
+        if errors:
+            pyplot.title("Neural Network architecture - weights' updates", fontsize=15)
+        else:
+            pyplot.title("Neural Network architecture - weights' values", fontsize=15)
         # figureName = 'ANN_' + strftime("%Y%m%d_%H%M%S", localtime()) + '.png'
         # pyplot.savefig(figureName, dpi=300, bbox_inches="tight")
         pyplot.show()
@@ -203,9 +206,10 @@ class DrawNN():
     # from input layer to output layer, e.g., a neural network of 5 nerons in the input layer,
     # 10 neurons in the hidden layer 1 and 1 neuron in the output layer is [5, 10, 1]
     # para: weights_list (optional) is the output weights list of a neural network which can be obtained via classifier.coefs_
-    def __init__(self, neural_network, weights_list=None):
+    def __init__(self, neural_network, weights_list=None, errors=False):
         self.neural_network = neural_network
         self.weights_list = weights_list
+        self.errors = errors
         # if weights_list is none, then create a uniform list to fill the weights_list
         if weights_list is None:
             weights_list = []
@@ -219,4 +223,4 @@ class DrawNN():
         network = NeuralNetwork(widest_layer)
         for l in self.neural_network:
             network.add_layer(l)
-        network.draw(self.weights_list)
+        network.draw(self.weights_list, self.errors)

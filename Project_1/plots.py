@@ -53,3 +53,8 @@ def plot_2d_error(x, y, pred):
 def plot_architecture(neurons, weights):
     architect = VisNN.DrawNN(neurons, weights)
     architect.draw()
+
+
+def plot_weight_updates(neurons, weights):
+    architect = VisNN.DrawNN(neurons, weights, errors=True)
+    architect.draw()

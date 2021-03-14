@@ -2,7 +2,7 @@ from activation import *
 from utils import one_hot_encode, shuffle_data, split_batches
 from layer import Layer
 from evaluation import measure_performance
-from plots import plot_architecture, plot_errors_vs_epochs
+from plots import plot_architecture, plot_weight_updates, plot_errors_vs_epochs
 from copy import deepcopy
 
 
@@ -164,16 +164,19 @@ class MLP:
         self.__create_layers(x.shape[1], y.shape[1])
         self.__compute_errors(x, y, evaluation_dataset)
 
+        if plot_arch:
+            plot_architecture(self.neurons, [l.W.T for l in self.layers])
+
         for i in range(self.max_epochs):
             self.__backpropagate(x, y)
             self.__compute_errors(x, y, evaluation_dataset)
 
+            if plot_errors_arch:
+                plot_weight_updates(
+                    self.neurons, [l.W.T - l.prev_W.T for l in self.layers])
+
             if plot_arch:
                 plot_architecture(self.neurons, [l.W.T for l in self.layers])
-
-            if plot_errors_arch:
-                plot_architecture(
-                    self.neurons, [l.W.T - l.prev_W.T for l in self.layers])
 
             if self.count_no_change > self.epochs_no_change:
                 print('Stop training process. ' +

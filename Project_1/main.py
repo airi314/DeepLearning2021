@@ -28,17 +28,17 @@ x_test = scale(x_test)
 # plot_2d_data(x, y, "Training data")
 
 # %%
-network = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
+network = MLP([5, 5], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
               alpha=0.9, max_epochs=4, regression=False, random_state=1)
 
 # %%
-network.fit(x, y, plot_arch=False, plot_errors_arch=True,
+network.fit(x, y, plot_arch=True, plot_errors_arch=True,
             evaluation_dataset=[x_test, y_test])
 # plot_errors_vs_epochs(network.errors, network.errors_test, "Cross-entropy")
 # plot_2d_error(x_test, y_test, network.predict(x_test))
 
-print(network.errors)
-print(network.errors_test)
+# print(network.errors)
+# print(network.errors_test)
 
 
 # %%
@@ -47,10 +47,3 @@ print(network.errors_test)
 
 # %%
 # plot_architecture(network.neurons, [l.W.T for l in network.layers])
-
-# %%
-#print("Weight shapes for each layer")
-#print([np.shape(l.W.T) for l in network.layers])
-#print("Error shapes for each layer")
-#print([np.shape(l.backward_error.T) for l in network.layers])
-# plot_architecture(network.neurons, [l.backward_error.T for l in network.layers])
