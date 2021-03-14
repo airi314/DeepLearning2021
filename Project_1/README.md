@@ -1,9 +1,7 @@
 # Project 1
 
 ### TO-DO
-* tracking propagated error (visualization of an error on each edge) iteration by iteration
-* second loss function for classification
-* maybe stop condition
+* analyse outcomes and create report 
 * test on MNIST dataset
 
 ## Topic
