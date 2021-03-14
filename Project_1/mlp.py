@@ -9,7 +9,7 @@ from copy import deepcopy
 class MLP:
     def __init__(self, hidden_layers, activ_function=sigmoid, batch_size=32,
                  init="Xavier", bias_presence=True, regression=True,
-                 eta=0.01, alpha=0, max_epochs=100, epochs_no_change=20,
+                 eta=0.01, alpha=0, max_epochs=100, epochs_no_change=3,
                  min_improvement=0.0001, random_state=123):
         """
         Multi-layer Perceptron classifier.
@@ -126,14 +126,16 @@ class MLP:
 
         if self.regr:
             self.measure = "MSE" if self.measure is None else self.measure
-            self.best_error = np.inf if self.best_error is None else self.best_error
         else:
             self.measure = "accuracy" if self.measure is None else self.measure
-            self.best_error = 0 if self.best_error is None else self.best_error
+        
+        self.best_error = np.inf if self.best_error is None else self.best_error
 
         y_pred = self.__forward(x)
         train_error = measure_performance(y_pred, y, self.regr, self.measure)
         self.errors.append(train_error)
+        if self.measure == "accuracy":
+            train_error = 1 - train_error
 
         if evaluation_dataset:
             x_test, y_test = evaluation_dataset
@@ -141,7 +143,7 @@ class MLP:
             self.errors_test.append(measure_performance(
                 y_test_pred, y_test, self.regr, self.measure))
 
-        if (self.regr and train_error < self.best_error - self.min_improvement) or (not self.regr and train_error > self.best_error + self.min_improvement):
+        if train_error < self.best_error - self.min_improvement:
             self.best_error = train_error
             self.count_no_change = 0
         else:

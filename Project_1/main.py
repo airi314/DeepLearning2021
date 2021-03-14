@@ -29,16 +29,16 @@ x_test = scale(x_test)
 
 # %%
 network = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
-              alpha=0.9, max_epochs=100, regression=False, random_state=1)
+              alpha=0.9, max_epochs=38, regression=False, random_state=1)
 
 # %%
 # network.fit(x, y, plot_arch=True, plot_errors_arch=True,
 #             evaluation_dataset=[x_test, y_test])
 
-network.fit(x, y, evaluation_dataset=[x_test, y_test])
+network.fit(x, y, evaluation_dataset=[x_test, y_test], measure='accuracy')
 
 # plot_errors_vs_epochs(network.errors, network.errors_test, "Cross-entropy")
-plot_2d_error(x_test, y_test, network.predict(x_test))
+#plot_2d_error(x_test, y_test, network.predict(x_test))
 
 # print(network.errors)
 # print(network.errors_test)
@@ -46,10 +46,13 @@ plot_2d_error(x_test, y_test, network.predict(x_test))
 
 # %%
 # plot_2d_data(x_test, network.predict(x_test), "Prediction on test data")
-print("Accuracy on test data: " + str(accuracy(network.predict(x_test, predict_proba=True), y_test)))
+print("Accuracy on training data: " + str(np.sum(network.predict(x) == y)/y.shape[0]))
+print("Accuracy on test data: " + str(np.sum(network.predict(x_test) == y_test)/y_test.shape[0]))
+print(network.errors)
+print(network.errors_test)
 
 # %%
-plot_architecture(network.neurons, [l.W.T for l in network.layers])
+#plot_architecture(network.neurons, [l.W.T for l in network.layers])
 
 # architectures = [[i] for i in range(1, 11)]
 # print(architectures)
