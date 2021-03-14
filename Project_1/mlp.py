@@ -183,7 +183,8 @@ class MLP:
                       str(self.epochs_no_change) + ' epochs with no improvement.')
                 break
 
-        plot_errors_vs_epochs(self.errors, self.errors_test, self.measure)
+        if plot_errors:
+            plot_errors_vs_epochs(self.errors, self.errors_test, self.measure)
 
     def predict(self, x, predict_proba=False):
         y_pred = self.__forward(x)
