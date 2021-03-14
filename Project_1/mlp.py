@@ -105,7 +105,12 @@ class MLP:
 
     def __backpropagate_batch(self, x, y):
         z = self.__forward(x)
-        error_weight = z.T - y.T
+
+        if self.measure == "cross_entropy":
+            error_weight = (np.ones_like(y.T) - y.T)/(np.ones_like(z.T) - z.T) - y.T/z.T
+        else:
+            error_weight = z.T - y.T
+
         self.layers[-1].backpropagate_last_layer(error_weight)
         for i in range(len(self.layers)-2, -1, -1):
             error_weight = self.layers[i+1].error_weight()
@@ -159,7 +164,7 @@ class MLP:
         if self.measure is None and self.regr:
             self.measure = "MSE"
         elif self.measure is None:
-            self.measure = "accuracy"
+            self.measure = "cross_entropy"
 
         self.__create_layers(x.shape[1], y.shape[1])
         self.__compute_errors(x, y, evaluation_dataset)
@@ -179,7 +184,7 @@ class MLP:
                 plot_architecture(self.neurons, [l.W.T for l in self.layers])
 
             if self.count_no_change > self.epochs_no_change:
-                print('Stop training process. ' +
+                print('Stop training process after ' + str(i) + " epochs. There were " +
                       str(self.epochs_no_change) + ' epochs with no improvement.')
                 break
 

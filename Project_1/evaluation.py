@@ -30,12 +30,7 @@ def MAE(y_pred, y):
 
 
 def cat_cross_entropy(y_pred, y):
-    y = np.argmax(y, axis=1).reshape([-1, 1])
     return -(np.sum(y * np.log(y_pred) + (1-y) * np.log(1-y_pred)))/y.shape[0]
-
-
-def hinge_loss(y_pred, y):
-    pass
 
 
 def accuracy(y_pred, y):
