@@ -38,13 +38,13 @@ def plot_errors_vs_epochs(errors, errors_test, measure_name):
 
 def plot_2d_error(x, y, pred):
     plt.figure()
-    y_new = np.abs(y-pred)
-    uniques = np.unique(y_new[:, 0])
+    y_new = np.array([0 if elem_y==elem_pred else 1 for elem_y, elem_pred in zip(y, pred)])
+    uniques = np.unique(y_new)
     colors = ['g', 'r']
-    for i in range(len(uniques)):
-        ax = x[:, 0][y_new[:, 0] == uniques[i]]
-        ay = x[:, 1][y_new[:, 0] == uniques[i]]
-        plt.plot(ax, ay, colors[i] + 'o')
+    for idx, elem in enumerate(uniques):
+        ax = x[:, 0][y_new == elem]
+        ay = x[:, 1][y_new == elem]
+        plt.plot(ax, ay, colors[idx] + 'o')
     plt.legend(['Classified correctly', 'Classified incorrectly'])
     plt.title("Misclassified observations")
     plt.show()
