@@ -163,16 +163,16 @@ plt.savefig('cross_entropy.png')
 
 # Quick tests on regression data
 
-train = read_data('data/square-simple-training.csv', classification=False)
+train = read_data('data/steps-small-training.csv', classification=False)
 train = scale(train)
 x, y = split_data(train, 1)
-test = read_data('data/square-simple-test.csv', classification=False)
+test = read_data('data/steps-small-test.csv', classification=False)
 test = scale(test)
 x_test, y_test = split_data(test, 1)
 
 
 network = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
-              alpha=0.9, max_epochs=300, epochs_no_change=10, regression=True, random_state=1)
+              alpha=0.9, max_epochs=300, epochs_no_change=20, regression=True, random_state=1)
 
 network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False)
 
