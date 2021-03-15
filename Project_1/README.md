@@ -1,7 +1,6 @@
 # Project 1
 
 ### TO-DO
-* analyse outcomes and create report 
 * test on MNIST dataset
 
 ## Topic
