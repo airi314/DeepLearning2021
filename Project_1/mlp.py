@@ -10,7 +10,7 @@ class MLP:
     def __init__(self, hidden_layers, activ_function=sigmoid, batch_size=32,
                  init="Xavier", bias_presence=True, regression=True,
                  eta=0.01, alpha=0, max_epochs=100, epochs_no_change=3,
-                 min_improvement=0.0001, random_state=123):
+                 min_improvement=0.0001, random_state=123, measure=None):
         """
         Multi-layer Perceptron classifier.
 
@@ -20,30 +20,30 @@ class MLP:
             i-th place corresponds to i-th hidden layer size
 
         activ_function : {linear, sigmoid, tanh, relu}, default=sigmoid
-            Ativation function for hidden layers. 
+            Ativation function for hidden layers.
 
-        batch_size : int 
+        batch_size : int
             Size of the batch during the training
 
-        init : {'uniform', 'linear', 'Xavier' 'He'}, default='Xavier' 
+        init : {'uniform', 'linear', 'Xavier' 'He'}, default='Xavier'
             Method of weights initialization
 
-        bias_presence : boolean; default: True 
+        bias_presence : boolean; default: True
             If bias is present in the training process
 
         regression : boolean; default: True
             If problem is regression problem or not
 
-        eta : float, default: 0.01 
+        eta : float, default: 0.01
             Learning rate
 
         alpha : float, default: 0
             Momentum for gradient descent update; should be between 0 and 1; if 0 then inactivate
 
-        max_epochs : int; default: 500 
+        max_epochs : int; default: 500
             Maximum number of epochs
 
-        epochs_no_change : int; default: 20 
+        epochs_no_change : int; default: 20
             Maximum number of epochs with no improvement
 
         random_state : int; default: 123
@@ -61,7 +61,13 @@ class MLP:
         self.batch_size = batch_size
         self.regr = regression
 
-        self.last_activ = linear if self.regr else softmax
+
+        self.measure = measure
+        if self.measure is None and self.regr:
+            self.measure = "MSE"
+        elif self.measure is None:
+            self.measure = "cross_entropy"
+        self.last_activ = linear if self.regr else softmax if self.measure=='cross_entropy' else sigmoid
 
         self.eta = eta
         self.alpha = alpha
@@ -106,10 +112,7 @@ class MLP:
     def __backpropagate_batch(self, x, y):
         z = self.__forward(x)
 
-        if self.measure == "cross_entropy":
-            error_weight = (np.ones_like(y.T) - y.T)/(np.ones_like(z.T) - z.T) - y.T/z.T
-        else:
-            error_weight = z.T - y.T
+        error_weight = z.T - y.T
 
         self.layers[-1].backpropagate_last_layer(error_weight)
         for i in range(len(self.layers)-2, -1, -1):
@@ -128,7 +131,7 @@ class MLP:
             self.measure = "MSE" if self.measure is None else self.measure
         else:
             self.measure = "accuracy" if self.measure is None else self.measure
-        
+
         self.best_error = np.inf if self.best_error is None else self.best_error
 
         y_pred = self.__forward(x)
@@ -149,9 +152,8 @@ class MLP:
         else:
             self.count_no_change += 1
 
-    def fit(self, x, y, measure=None, evaluation_dataset=None, plot_errors=True, plot_arch=False, plot_errors_arch=False):
+    def fit(self, x, y, evaluation_dataset=None, plot_errors=True, plot_arch=False, plot_errors_arch=False):
 
-        self.measure = measure
         self.errors = []
         self.errors_test = []
         self.best_error = None
@@ -162,11 +164,6 @@ class MLP:
 
         if not self.regr and evaluation_dataset:
             evaluation_dataset[1] = one_hot_encode(evaluation_dataset[1])
-
-        if self.measure is None and self.regr:
-            self.measure = "MSE"
-        elif self.measure is None:
-            self.measure = "cross_entropy"
 
         self.__create_layers(x.shape[1], y.shape[1])
         self.__compute_errors(x, y, evaluation_dataset)
@@ -199,3 +196,4 @@ class MLP:
             y_pred = np.argmax(y_pred, axis=1)
             y_pred = y_pred.reshape([-1, 1])
         return y_pred
+
