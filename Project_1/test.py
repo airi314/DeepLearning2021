@@ -21,20 +21,25 @@ y_test = y_test - [1]
 x = scale(x)
 x_test = scale(x_test)
 
-
-## Testing activation functions
+# Testing activation functions
 
 # Accuracy throughout learning process for one random state
-network = MLP([5], sigmoid, alpha=0.9, max_epochs=100, regression=False, random_state=1, epochs_no_change=100)
-network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False, calculate_accuracy=True)
+network = MLP([5], sigmoid, alpha=0.9, max_epochs=100,
+              regression=False, random_state=1, epochs_no_change=100)
+network.fit(x, y, evaluation_dataset=[
+            x_test, y_test], plot_errors=False, calculate_accuracy=True)
 acc_sigm = network.accuracy
 
-network = MLP([5], relu, alpha=0.9, max_epochs=100, regression=False, random_state=1, epochs_no_change=100)
-network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False, calculate_accuracy=True)
+network = MLP([5], relu, alpha=0.9, max_epochs=100,
+              regression=False, random_state=1, epochs_no_change=100)
+network.fit(x, y, evaluation_dataset=[
+            x_test, y_test], plot_errors=False, calculate_accuracy=True)
 acc_relu = network.accuracy
 
-network = MLP([5], tanh, alpha=0.9, max_epochs=100, regression=False, random_state=1, epochs_no_change=100)
-network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False, calculate_accuracy=True)
+network = MLP([5], tanh, alpha=0.9, max_epochs=100,
+              regression=False, random_state=1, epochs_no_change=100)
+network.fit(x, y, evaluation_dataset=[
+            x_test, y_test], plot_errors=False, calculate_accuracy=True)
 acc_tanh = network.accuracy
 
 plt.figure()
@@ -56,24 +61,27 @@ acc_tst = np.zeros((n, len(act_fn)))
 for i in range(n):
     print(i)
     for idx, fn in enumerate(act_fn):
-        network = MLP([5], fn, alpha=0.9, max_epochs=100, regression=False, random_state=i)
-        network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False)
-        acc_tr[i][idx] = accuracy(network.predict(x),y)
-        acc_tst[i][idx] = accuracy(network.predict(x_test),y_test)
+        network = MLP([5], fn, alpha=0.9, max_epochs=100,
+                      regression=False, random_state=i)
+        network.fit(x, y, evaluation_dataset=[
+                    x_test, y_test], plot_errors=False)
+        acc_tr[i][idx] = accuracy(network.predict(x), y)
+        acc_tst[i][idx] = accuracy(network.predict(x_test), y_test)
 print('Train and test acc for sigmoid, relu and tanh')
 print(np.mean(acc_tr, axis=0))
 print(np.mean(acc_tst, axis=0))
 
 
-## Comparing different networks architectures
+# Comparing different networks architectures
 
 # One hidden layer, different number of neurons
 accuracy_list = list()
-architectures = [[5], [10], [25], [100], [200], [500]] 
+architectures = [[5], [10], [25], [100], [200], [500]]
 for arch in architectures:
     network = MLP(arch, sigmoid, init='Xavier', bias_presence=True, eta=0.01,
                   alpha=0.9, max_epochs=150, regression=False, random_state=1, epochs_no_change=10)
-    network.fit(x, y, evaluation_dataset=[x_test, y_test], calculate_accuracy=True, plot_errors=False)
+    network.fit(x, y, evaluation_dataset=[
+                x_test, y_test], calculate_accuracy=True, plot_errors=False)
     accuracy_list.append(network.accuracy)
 
 plt.figure()
@@ -91,11 +99,12 @@ plt.savefig('arch_one_layer.png')
 
 # Different number of hidden layers
 accuracy_list = list()
-architectures = [[10], [10, 10], [10, 10, 10], [10, 10, 10, 10]] 
+architectures = [[10], [10, 10], [10, 10, 10], [10, 10, 10, 10]]
 for arch in architectures:
     network = MLP(arch, sigmoid, init='Xavier', bias_presence=True, eta=0.01,
                   alpha=0.9, max_epochs=150, regression=False, random_state=1, epochs_no_change=10)
-    network.fit(x, y, evaluation_dataset=[x_test, y_test], calculate_accuracy=True, plot_errors=False)
+    network.fit(x, y, evaluation_dataset=[
+                x_test, y_test], calculate_accuracy=True, plot_errors=False)
     accuracy_list.append(network.accuracy)
 
 plt.figure()
@@ -122,20 +131,22 @@ x = scale(x)
 x_test = scale(x_test)
 
 
-## Comparing different loss functions
+# Comparing different loss functions
 
 # Default measure - cross entropy for classification with softmax function in last layer
 network_1 = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
-              alpha=0.9, max_epochs=300, epochs_no_change=10, regression=False, random_state=1)
+                alpha=0.9, max_epochs=300, epochs_no_change=10, regression=False, random_state=1)
 
-network_1.fit(x, y, evaluation_dataset=[x_test, y_test], calculate_accuracy=True, plot_errors=False)
+network_1.fit(x, y, evaluation_dataset=[
+              x_test, y_test], calculate_accuracy=True, plot_errors=False)
 
 # Measure - binary cross entropy with sigmoid function in last layer
 network_2 = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
-                alpha=0.9, max_epochs=300, epochs_no_change=10, regression=False, 
+                alpha=0.9, max_epochs=300, epochs_no_change=10, regression=False,
                 random_state=1, measure='binary_cross_entropy')
 
-network_2.fit(x, y, evaluation_dataset=[x_test, y_test], calculate_accuracy=True, plot_errors=False)
+network_2.fit(x, y, evaluation_dataset=[
+              x_test, y_test], calculate_accuracy=True, plot_errors=False)
 
 plt.figure()
 labels = ['cross entropy', 'binary cross entropy']
@@ -148,3 +159,21 @@ plt.ylim([0.99, 0.997])
 plt.xlabel("Epochs")
 plt.ylabel("Accuracy")
 plt.savefig('cross_entropy.png')
+
+
+# Quick tests on regression data
+
+train = read_data('data/square-simple-training.csv', classification=False)
+train = scale(train)
+x, y = split_data(train, 1)
+test = read_data('data/square-simple-test.csv', classification=False)
+test = scale(test)
+x_test, y_test = split_data(test, 1)
+
+
+network = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
+              alpha=0.9, max_epochs=300, epochs_no_change=10, regression=True, random_state=1)
+
+network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False)
+
+plot_errors_vs_epochs(network.errors, network.errors_test, 'MSE')

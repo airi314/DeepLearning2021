@@ -166,6 +166,8 @@ class MLP:
         if not self.regr and evaluation_dataset:
             evaluation_dataset[1] = one_hot_encode(evaluation_dataset[1])
 
+        if self.regr:
+            calculate_accuracy = False
         if calculate_accuracy:
             self.accuracy = []
 

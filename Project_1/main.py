@@ -35,13 +35,13 @@ network = MLP([5], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
 # Train the network
 network.fit(x, y, plot_arch=True, plot_errors_arch=True,
             evaluation_dataset=[x_test, y_test])
-print("Accuracy on training data: " + str(accuracy(network.predict(x),y)))
+print("Accuracy on training data: " + str(accuracy(network.predict(x), y)))
 
 
 # Measure performance on test set
 plot_2d_data(x_test, network.predict(x_test), "Prediction on test data")
 plot_2d_error(x_test, y_test, network.predict(x_test))
-print("Accuracy on test data: " + str(accuracy(network.predict(x_test),y_test)))
+print("Accuracy on test data: " + str(accuracy(network.predict(x_test), y_test)))
 
 
 # Final architecture
