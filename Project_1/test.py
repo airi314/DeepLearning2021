@@ -21,7 +21,51 @@ y_test = y_test - [1]
 x = scale(x)
 x_test = scale(x_test)
 
-# Comparing different networks architectures
+
+## Testing activation functions
+
+# Accuracy throughout learning process for one random state
+network = MLP([5], sigmoid, alpha=0.9, max_epochs=100, regression=False, random_state=1, epochs_no_change=100)
+network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False, calculate_accuracy=True)
+acc_sigm = network.accuracy
+
+network = MLP([5], relu, alpha=0.9, max_epochs=100, regression=False, random_state=1, epochs_no_change=100)
+network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False, calculate_accuracy=True)
+acc_relu = network.accuracy
+
+network = MLP([5], tanh, alpha=0.9, max_epochs=100, regression=False, random_state=1, epochs_no_change=100)
+network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False, calculate_accuracy=True)
+acc_tanh = network.accuracy
+
+plt.figure()
+x = [x for x in range(100)]
+plt.plot(x, acc_sigm, 'red')
+plt.plot(x, acc_relu, 'blue')
+plt.plot(x, acc_tanh, 'k')
+plt.title("Accuracy during learning for different activation functions")
+plt.legend(["Sigmoid", "ReLU", "Hyperbolic tangent"])
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.savefig('act_fn_acc.png')
+
+# Mean accuracy for different random states
+n = 100
+act_fn = [sigmoid, relu, tanh]
+acc_tr = np.zeros((n, len(act_fn)))
+acc_tst = np.zeros((n, len(act_fn)))
+for i in range(n):
+    print(i)
+    for idx, fn in enumerate(act_fn):
+        network = MLP([5], fn, alpha=0.9, max_epochs=100, regression=False, random_state=i)
+        network.fit(x, y, evaluation_dataset=[x_test, y_test], plot_errors=False)
+        acc_tr[i][idx] = accuracy(network.predict(x),y)
+        acc_tst[i][idx] = accuracy(network.predict(x_test),y_test)
+print('Train and test acc for sigmoid, relu and tanh')
+print(np.mean(acc_tr, axis=0))
+print(np.mean(acc_tst, axis=0))
+
+
+## Comparing different networks architectures
 
 # One hidden layer, different number of neurons
 accuracy_list = list()
@@ -78,7 +122,8 @@ x = scale(x)
 x_test = scale(x_test)
 
 
-# Comparing different loss functions
+## Comparing different loss functions
+
 # Default measure - cross entropy for classification with softmax function in last layer
 network_1 = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
               alpha=0.9, max_epochs=300, epochs_no_change=10, regression=False, random_state=1)
