@@ -125,7 +125,7 @@ class MLP:
         for i, layer in enumerate(self.layers[1:]):
             layer.update_weights(self.z[i], self.eta, self.alpha)
 
-    def __compute_errors(self, x, y, evaluation_dataset):
+    def __compute_errors(self, x, y, evaluation_dataset, calculate_accuracy):
 
         if self.regr:
             self.measure = "MSE" if self.measure is None else self.measure
@@ -137,8 +137,9 @@ class MLP:
         y_pred = self.__forward(x)
         train_error = measure_performance(y_pred, y, self.regr, self.measure)
         self.errors.append(train_error)
-        if self.measure == "accuracy":
-            train_error = 1 - train_error
+
+        if calculate_accuracy:
+            self.accuracy.append(measure_performance(np.argmax(y_pred, axis=1), np.argmax(y, axis=1), self.regr, "accuracy"))
 
         if evaluation_dataset:
             x_test, y_test = evaluation_dataset
@@ -152,7 +153,7 @@ class MLP:
         else:
             self.count_no_change += 1
 
-    def fit(self, x, y, evaluation_dataset=None, plot_errors=True, plot_arch=False, plot_errors_arch=False):
+    def fit(self, x, y, evaluation_dataset=None, plot_errors=True, plot_arch=False, plot_errors_arch=False, calculate_accuracy=False):
 
         self.errors = []
         self.errors_test = []
@@ -165,15 +166,18 @@ class MLP:
         if not self.regr and evaluation_dataset:
             evaluation_dataset[1] = one_hot_encode(evaluation_dataset[1])
 
+        if calculate_accuracy:
+            self.accuracy = []
+
         self.__create_layers(x.shape[1], y.shape[1])
-        self.__compute_errors(x, y, evaluation_dataset)
+        self.__compute_errors(x, y, evaluation_dataset, calculate_accuracy)
 
         if plot_arch:
             plot_architecture(self.neurons, [l.W.T for l in self.layers])
 
         for i in range(self.max_epochs):
             self.__backpropagate(x, y)
-            self.__compute_errors(x, y, evaluation_dataset)
+            self.__compute_errors(x, y, evaluation_dataset, calculate_accuracy)
 
             if plot_errors_arch:
                 plot_weight_updates(

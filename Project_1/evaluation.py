@@ -10,6 +10,7 @@ def measure_performance(y_pred, y, regression=True, measure='accuracy'):
             'MSE': MSE
         },
         False:  {
+        	'accuracy': accuracy,
             'cross_entropy': cross_entropy,
             'binary_cross_entropy': bin_cross_entropy
         }
