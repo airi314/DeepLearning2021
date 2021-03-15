@@ -61,13 +61,12 @@ class MLP:
         self.batch_size = batch_size
         self.regr = regression
 
-
         self.measure = measure
         if self.measure is None and self.regr:
             self.measure = "MSE"
         elif self.measure is None:
             self.measure = "cross_entropy"
-        self.last_activ = linear if self.regr else softmax if self.measure=='cross_entropy' else sigmoid
+        self.last_activ = linear if self.regr else softmax if self.measure == 'cross_entropy' else sigmoid
 
         self.eta = eta
         self.alpha = alpha
@@ -139,7 +138,8 @@ class MLP:
         self.errors.append(train_error)
 
         if calculate_accuracy:
-            self.accuracy.append(measure_performance(np.argmax(y_pred, axis=1), np.argmax(y, axis=1), self.regr, "accuracy"))
+            self.accuracy.append(measure_performance(
+                np.argmax(y_pred, axis=1), np.argmax(y, axis=1), self.regr, "accuracy"))
 
         if evaluation_dataset:
             x_test, y_test = evaluation_dataset
@@ -200,4 +200,3 @@ class MLP:
             y_pred = np.argmax(y_pred, axis=1)
             y_pred = y_pred.reshape([-1, 1])
         return y_pred
-
