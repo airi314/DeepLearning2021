@@ -46,3 +46,4 @@ print("Accuracy on test data: " + str(accuracy(network.predict(x_test), y_test))
 
 # Final architecture
 plot_architecture(network.neurons, [l.W.T for l in network.layers])
+

@@ -11,17 +11,17 @@ from plots import *
 from layer import Layer
 from mlp import MLP
 
-colors = ['r', 'g', 'b', 'y', 'm', 'black']
-train = read_data('data/data.three_gauss.train.10000.csv', classification=True)
+
+## Testing activation functions
+
+train = read_data('data/data.simple.train.10000.csv', classification=True)
 x, y = split_data(train, 2)
-test = read_data('data/data.three_gauss.test.10000.csv', classification=True)
+test = read_data('data/data.simple.test.10000.csv', classification=True)
 x_test, y_test = split_data(test, 2)
 y = y - [1]
 y_test = y_test - [1]
 x = scale(x)
 x_test = scale(x_test)
-
-# Testing activation functions
 
 # Accuracy throughout learning process for one random state
 network = MLP([5], sigmoid, alpha=0.9, max_epochs=100,
@@ -72,7 +72,17 @@ print(np.mean(acc_tr, axis=0))
 print(np.mean(acc_tst, axis=0))
 
 
-# Comparing different networks architectures
+## Comparing different networks architectures
+
+colors = ['r', 'g', 'b', 'y', 'm', 'black']
+train = read_data('data/data.three_gauss.train.10000.csv', classification=True)
+x, y = split_data(train, 2)
+test = read_data('data/data.three_gauss.test.10000.csv', classification=True)
+x_test, y_test = split_data(test, 2)
+y = y - [1]
+y_test = y_test - [1]
+x = scale(x)
+x_test = scale(x_test)
 
 # One hidden layer, different number of neurons
 accuracy_list = list()
@@ -95,7 +105,6 @@ plt.ylim([0.93, 0.94])
 plt.xlabel("Epochs")
 plt.ylabel("Accuracy")
 plt.savefig('arch_one_layer.png')
-
 
 # Different number of hidden layers
 accuracy_list = list()
@@ -121,6 +130,8 @@ plt.ylabel("Accuracy")
 plt.savefig('arch_many_layers.png')
 
 
+## Comparing different loss functions
+
 train = read_data('data/data.simple.train.10000.csv', classification=True)
 x, y = split_data(train, 2)
 test = read_data('data/data.simple.test.10000.csv', classification=True)
@@ -129,9 +140,6 @@ y = y - [1]
 y_test = y_test - [1]
 x = scale(x)
 x_test = scale(x_test)
-
-
-# Comparing different loss functions
 
 # Default measure - cross entropy for classification with softmax function in last layer
 network_1 = MLP([20], sigmoid, init='Xavier', bias_presence=True, eta=0.01,
@@ -161,7 +169,7 @@ plt.ylabel("Accuracy")
 plt.savefig('cross_entropy.png')
 
 
-# Quick tests on regression data
+## Quick tests on regression data
 
 train = read_data('data/steps-small-training.csv', classification=False)
 train = scale(train)
