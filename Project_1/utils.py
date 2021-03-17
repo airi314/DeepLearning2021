@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import os
+import torch
 
 
 def scale(X):
@@ -39,3 +41,14 @@ def split_batches(x, y, batch_size):
     batch_x = np.array_split(x, batch_nr)
     batch_y = np.array_split(y, batch_nr)
     return batch_x, batch_y
+
+def load_mnist(dir_path):
+    [x, y] = torch.load(os.path.join(dir_path, 'processed/training.pt'))
+    [x_test, y_test] = torch.load(os.path.join(dir_path, 'processed/test.pt'))
+    
+    x = np.array(x).reshape(60000, -1)/255
+    y = np.array(y).reshape(-1,1)
+    x_test = np.array(x_test).reshape(10000, -1)/255
+    y_test = np.array(y_test).reshape(-1,1)
+    
+    return x, y, x_test, y_test
