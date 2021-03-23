@@ -10,7 +10,7 @@ CIFAR-10 (https://www.kaggle.com/c/cifar-10/)
 ## Requirements
 
 * utilizing code from external sources - only with references and applying some modifications
-* application of pretrained models (like AlexNet, VGG) - oermitted, recommended
+* application of pretrained models (like AlexNet, VGG) - permitted, recommended
 
 * reproducibility (random number generator)
 * each experiment should be repeated multiple times
@@ -24,8 +24,11 @@ CIFAR-10 (https://www.kaggle.com/c/cifar-10/)
 
 ## Ideas
 
-* ensembling (soft voting or majority/hard voting)
+* basic CNN -> increasing number of layer/size of layers
 * data augmentation
+* test time augmentation
+* ensembling (soft voting or majority/hard voting)
+* using models pretrained on ImageNet (for example EfficientNet)
 
 ## Timetable
 
