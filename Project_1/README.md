@@ -1,15 +1,12 @@
 # Project 1
 
-### TO-DO
-* test on MNIST dataset
-
 ## Topic
 Multilayer perceptron (MLP) employing backpropagation algorithm
 
 ## Datasets
 
 * project part I - syntetic dataset provided druing the class
-* project part II - MNIST dataset (https://www.kaggle.com/c/digit-recognizer)
+* project part II - MNIST dataset (https://www.kaggle.com/c/digit-recognizer, https://www.di.ens.fr/~lelarge/MNIST.tar.gz)
 
 ## Requirements
 
