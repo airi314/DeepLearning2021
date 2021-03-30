@@ -5,7 +5,7 @@ Image classification with convolutional neural networks
 
 ## Plan
 
-- [X] Loading and exploring dataset (is it OK to use CIFAR built-in PyTorch?)
+- [X] Loading and exploring dataset
 - [X] Training simple, own written CNN ~58%
 - [X] Training simple CNN with simple data augmentation
 - [ ] Training simple CNN with more sophisticated data augmentation (for example AutoAugment, cutout)
