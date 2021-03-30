@@ -3,6 +3,20 @@
 ## Topic
 Image classification with convolutional neural networks
 
+## Plan
+
+- [X] Loading and exploring dataset (is it OK to use CIFAR built-in PyTorch?)
+- [X] Training simple, own written CNN ~58%
+- [X] Training simple CNN with simple data augmentation
+- [ ] Training simple CNN with more sophisticated data augmentation (for example AutoAugment, cutout)
+- [ ] Training simple CNN with different optimizer, learning rate, and step size
+- [X] Training CNN with pretrained ResNet weights ~ 92%
+- [ ] Training CNN with pretrained ResNet weights with different data augmentation, optimizer, etc.
+- [ ] Training CNN with other pretrained models
+- [ ] Implementation of TTA
+- [ ] Ensembling of few previously trained models
+- [ ] ...
+
 ## Datasets
 
 CIFAR-10 (https://www.kaggle.com/c/cifar-10/)
