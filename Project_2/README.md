@@ -9,11 +9,11 @@ Image classification with convolutional neural networks
 - [X] Training simple, own written CNN ~58%
 - [X] Training simple CNN with simple data augmentation
 - [ ] Training simple CNN with more sophisticated data augmentation (for example AutoAugment, cutout)
-- [ ] Training simple CNN with different optimizer, learning rate, and step size
+- [X] Training simple CNN with different optimizer, learning rate, and step size
 - [X] Training CNN with pretrained ResNet weights ~ 92%
-- [ ] Training CNN with pretrained ResNet weights with different data augmentation, optimizer, etc.
-- [ ] Training CNN with other pretrained models
-- [ ] Implementation of TTA
+- [X] Training CNN with pretrained ResNet weights with different data augmentation, optimizer, etc.
+- [X] Training CNN with other pretrained models
+- [X] Implementation of TTA
 - [ ] Ensembling of few previously trained models
 - [ ] ...
 
