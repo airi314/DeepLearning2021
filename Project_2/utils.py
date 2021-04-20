@@ -13,14 +13,13 @@ from copy import deepcopy
 from tqdm import tqdm
 import random
 
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def seed_worker(worker_id):
     worker_seed = torch.initial_seed() % 2**32
-    np.random.seed(worker_seed)
-    random.seed(worker_seed)
+    np.random.seed(worker_seed + worker_id)
+    random.seed(worker_seed + worker_id)
 
 
 def load_data(train_transform, test_transform, random_seed = 0):
@@ -30,9 +29,13 @@ def load_data(train_transform, test_transform, random_seed = 0):
     torch.manual_seed(random_seed)
     torch.backends.cudnn.deterministic=True
 
-    train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
+    train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform = train_transform)
+    train, _ = random_split(train, [45000, 5000], generator = torch.manual_seed(random_seed))
+
+    val = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform = test_transform)
+    _, val = random_split(val, [45000, 5000], generator = torch.manual_seed(random_seed))
+
     test = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=test_transform)
-    train, val = random_split(train, [45000, 5000], generator = torch.manual_seed(random_seed))
 
     train_loader = torch.utils.data.DataLoader(train, batch_size=64, shuffle=False, num_workers=2, worker_init_fn=seed_worker)
     val_loader = torch.utils.data.DataLoader(val, batch_size=64, shuffle=False, num_workers=2, worker_init_fn=seed_worker)
@@ -41,7 +44,7 @@ def load_data(train_transform, test_transform, random_seed = 0):
     return train_loader, val_loader, test_loader
 
 
-def train_network(network, train_loader, val_loader, epochs = 10, criterion = None, optimizer = None, print_results = True):
+def train_network(network, train_loader, val_loader, epochs = 10, criterion = None, optimizer = None, scheduler = None, print_results = True):
 
     best_accuracy = -1
     best_model = None
@@ -64,6 +67,7 @@ def train_network(network, train_loader, val_loader, epochs = 10, criterion = No
 
         training_loss = 0
         training_correct = 0
+        network.train(True)
 
         for i, data in enumerate(train_loader, 0):
 
@@ -92,6 +96,7 @@ def train_network(network, train_loader, val_loader, epochs = 10, criterion = No
             print(f"Training accuracy: {training_accuracy}%")
         
         validation_correct = 0
+        network.train(False)
         with torch.no_grad():
             for inputs,labels in val_loader:
                 outputs = network(inputs.to(device)).cpu()
@@ -109,6 +114,8 @@ def train_network(network, train_loader, val_loader, epochs = 10, criterion = No
             best_accuracy = validation_correct
             best_model = deepcopy(network.state_dict())
         
+        if scheduler:
+          scheduler.step()
     
     if print_results:
         print('Finished Training')
@@ -128,7 +135,7 @@ def evaluate_network(network, test_loader):
             predicted = torch.argmax(outputs, dim=1)
             test_correct += (predicted == labels).sum().item()
 
-    print(f"Test accuracy: {test_correct*100/size_test}%")
+    return test_correct*100/size_test
 
 
 def plot_loss(network):
