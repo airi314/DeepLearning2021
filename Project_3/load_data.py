@@ -7,23 +7,26 @@ import torchaudio
 from torch.optim import SGD, Adam, lr_scheduler
 import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
-from torchaudio.datasets import SPEECHCOMMANDS
+from dataset import SPEECHCOMMANDS
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print('Device: ', device)
 
 # load and split data
-train_set = SPEECHCOMMANDS(root = './data/train', folder_in_archive = '', subset='training', download=False)
-valid_set = SPEECHCOMMANDS(root = './data/train', folder_in_archive = '', subset='validation', download=False)
-test_set = SPEECHCOMMANDS(root = './data/train', folder_in_archive = '', subset='testing', download=False)
+train_set = SPEECHCOMMANDS(root = 'data/train/', subset='training')
+valid_set = SPEECHCOMMANDS(root = 'data/train/', subset='validation')
+test_set = SPEECHCOMMANDS(root = 'data/train/', subset='testing')
 
 # check dataset size
 print('Number of train instances: ', len(train_set))
 print('Number of validation instances: ', len(valid_set))
 print('Number of test instances: ', len(test_set))
 
-labels = sorted(list(set(x[2] for x in train_set)))
-print('Labels: ', labels)
+labels_train = sorted(list(set(x[2] for x in train_set)))
+print('Labels: ', labels_train)
+
+labels_test = sorted(list(set(x[2] for x in test_set)))
+print('Labels: ', labels_test)
 
 if device == "cuda":
     num_workers = 1
@@ -36,7 +39,7 @@ batch_size = 64
 
 # map label name to index in the array
 def label_to_index(word):
-    return torch.tensor(labels.index(word))
+    return torch.tensor(labels_train.index(word))
 
 # pad data with zeros - each item should be same length
 def pad_sequence(batch):
