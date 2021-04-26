@@ -13,18 +13,21 @@ from torchaudio.datasets.utils import (
 URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
-TEST_LABELS = ['yes', 'no', 'up', 'down', 'left', 'right', 'on', 'off', 'stop', 'go']
+TEST_LABELS = ['yes', 'no', 'up', 'down',
+               'left', 'right', 'on', 'off', 'stop', 'go']
+
 
 def _load_list(root, *filenames):
     output = []
     for filename in filenames:
         filepath = os.path.join(root, filename)
         with open(filepath) as fileobj:
-            output += [os.path.normpath(os.path.join(root, line.strip())) for line in fileobj]
+            output += [os.path.normpath(os.path.join(root, line.strip()))
+                       for line in fileobj]
     return output
 
 
-def load_speechcommands_item(filepath: str, path: str, test = True) -> Tuple[Tensor, int, str, str, int]:
+def load_speechcommands_item(filepath: str, path: str, test=True) -> Tuple[Tensor, int, str, str, int]:
     relpath = os.path.relpath(filepath, path)
     label, filename = os.path.split(relpath)
     speaker, _ = os.path.splitext(filename)
@@ -82,7 +85,8 @@ class SPEECHCOMMANDS(Dataset):
             self.test = True
         elif subset == "training":
             self.test = False
-            excludes = set(_load_list(self._path, "../validation_list.txt", "../testing_list.txt"))
+            excludes = set(_load_list(
+                self._path, "../validation_list.txt", "../testing_list.txt"))
             print(len(excludes))
             walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
             print(len(walker))
@@ -95,7 +99,8 @@ class SPEECHCOMMANDS(Dataset):
             print(len(self._walker))
         else:
             walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
-            self._walker = [w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
+            self._walker = [
+                w for w in walker if HASH_DIVIDER in w and EXCEPT_FOLDER not in w]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str, int]:
         """Load the n-th sample from the dataset.
@@ -108,7 +113,6 @@ class SPEECHCOMMANDS(Dataset):
         """
         fileid = self._walker[n]
         return load_speechcommands_item(fileid, self._path, self.test)
-
 
     def __len__(self) -> int:
         return len(self._walker)
