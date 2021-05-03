@@ -14,7 +14,7 @@ URL = "speech_commands_v0.02"
 HASH_DIVIDER = "_nohash_"
 EXCEPT_FOLDER = "_background_noise_"
 TEST_LABELS = ['yes', 'no', 'up', 'down',
-               'left', 'right', 'on', 'off', 'stop', 'go']
+               'left', 'right', 'on', 'off', 'stop', 'go', 'silence']
 
 
 def _load_list(root, *filenames):
@@ -67,10 +67,10 @@ class SPEECHCOMMANDS(Dataset):
                  subset: Optional[str] = None,
                  ) -> None:
 
-        assert subset is None or subset in ["training", "validation", "testing"], (
-            "When `subset` not None, it must take a value from "
-            + "{'training', 'validation', 'testing'}."
-        )
+#         assert subset is None or subset in ["training", "validation", "testing"], (
+#             "When `subset` not None, it must take a value from "
+#             + "{'training', 'validation', 'testing'}."
+#         )
 
         # Get string representation of 'root' in case Path object is passed
         root = os.fspath(root)
@@ -87,16 +87,14 @@ class SPEECHCOMMANDS(Dataset):
             self.test = False
             excludes = set(_load_list(
                 self._path, "../validation_list.txt", "../testing_list.txt"))
-            print(len(excludes))
             walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
-            print(len(walker))
             self._walker = [
                 w for w in walker
                 if HASH_DIVIDER in w
                 and EXCEPT_FOLDER not in w
                 and os.path.normpath(w) not in excludes
             ]
-            print(len(self._walker))
+       
         else:
             walker = sorted(str(p) for p in Path(self._path).glob('*/*.wav'))
             self._walker = [

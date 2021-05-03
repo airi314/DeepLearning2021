@@ -9,7 +9,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 (train_loader, val_loader, test_loader), labels = load_data()
 
 correct_labels = ['yes', 'no', 'up', 'down', 'left',
-                  'right', 'on', 'off', 'stop', 'go']
+                  'right', 'on', 'off', 'stop', 'go', 'silence']
 
 correct_index = [torch.tensor(labels.index(x)) for x in correct_labels]
 

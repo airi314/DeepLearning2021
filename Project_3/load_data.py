@@ -9,8 +9,7 @@ from tqdm.notebook import tqdm
 from dataset import SPEECHCOMMANDS
 import numpy as np
 
-CORRECT_LABELS = ['yes', 'no', 'up', 'down',
-                  'left', 'right', 'on', 'off', 'stop', 'go']
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -77,14 +76,10 @@ def pad_sequence(batch):
 
 
 def collate_fn(batch, labels_train):
-
     inputs, labels = [], []
-
     for waveform, _, label, *_ in batch:
         inputs += [waveform]
         labels += [torch.tensor(labels_train.index(label))]
-
     inputs = pad_sequence(inputs)
     labels = torch.stack(labels)
-
     return inputs, labels

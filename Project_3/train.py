@@ -84,6 +84,8 @@ def train_network(network,
 
 def evaluate_network(network, test_loader, correct_index):
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     test_correct = 0
     size_test = len(test_loader.dataset)
 
