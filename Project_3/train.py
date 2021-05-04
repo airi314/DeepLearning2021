@@ -3,6 +3,10 @@ import torch.nn.functional as F
 from torch.optim import SGD
 from tqdm import tqdm
 import numpy as np
+from copy import deepcopy
+import matplotlib.pyplot as plt
+import itertools
+from sklearn.metrics import confusion_matrix
 
 
 def map_predictions(correct_index, predicted):
@@ -81,9 +85,13 @@ def train_network(network,
         print('-'*20)
         network.val_accuracy.append(val_accuracy)
 
+        best_model = deepcopy(network.state_dict())
+        network.best_model = best_model
+
 
 def evaluate_network(network, test_loader, correct_index):
 
+    network.load_state_dict(network.best_model)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     test_correct = 0
@@ -93,14 +101,70 @@ def evaluate_network(network, test_loader, correct_index):
 
         data = data.to(device)
         target = target.to(device)
-        output = model(data)
+        output = network(data)
 
     test_correct = 0
     with torch.no_grad():
-        for inputs, labels in val_loader:
+        for inputs, labels in test_loader:
             outputs = network(inputs.to(device)).cpu()
             predicted = torch.argmax(outputs.detach(), dim=2)
             predicted = map_predictions(correct_index, predicted)
             test_correct += (np.array(predicted) == np.array(labels)).sum()
 
     return test_correct*100/size_test
+
+
+def get_predictions(network, test_loader, correct_index):
+
+    y_true = np.array([])
+    y_pred = np.array([])
+
+    network.load_state_dict(network.best_model)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    test_correct = 0
+    size_test = len(test_loader.dataset)
+
+    for data, target in test_loader:
+
+        data = data.to(device)
+        target = target.to(device)
+        output = network(data)
+
+    test_correct = 0
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            outputs = network(inputs.to(device)).cpu()
+            predicted = torch.argmax(outputs.detach(), dim=2)
+            predicted = map_predictions(correct_index, predicted)
+            test_correct += (np.array(predicted) == np.array(labels)).sum()
+            y_true = np.concatenate((y_true, labels))
+            y_pred = np.concatenate((y_pred, predicted))
+
+    return y_true, y_pred
+
+
+def plot_confusion_matrix(y_true, y_pred, correct_index, correct_labels = None):
+
+    cm = confusion_matrix(y_true, y_pred, correct_index)
+    cmap = plt.get_cmap('Blues')
+    plt.figure(figsize=(10, 10))
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title('Confusion matrix')
+    plt.colorbar()
+
+    if correct_labels is not None:
+        tick_marks = np.arange(len(correct_labels))
+        plt.xticks(tick_marks, correct_labels, rotation=45)
+        plt.yticks(tick_marks, correct_labels)
+
+    thresh = cm.max() / 2
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, "{:,}".format(cm[i, j]),
+                  horizontalalignment="center",
+                  color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.show()
