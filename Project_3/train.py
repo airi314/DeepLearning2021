@@ -17,7 +17,8 @@ def train_network(network,
                   train_loader, val_loader, correct_index, epochs=10,
                   criterion=None, optimizer=None,
                   transforms_train=list(), transforms_val=list(),
-                  print_results = False):
+                  print_results = False,
+                  random_seed = 0):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

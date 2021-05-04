@@ -18,7 +18,7 @@ def seed_worker(worker_id):
     random.seed(worker_seed + worker_id)
 
 
-def load_data(root='data/train', batch_size=64):
+def load_data(root='data/train', batch_size=64, random_seed=0):
 
     random.seed(random_seed)
     np.random.seed(random_seed)
@@ -38,7 +38,7 @@ def load_data(root='data/train', batch_size=64):
     labels = sorted(list(set(x[2] for x in train_set)))
     labels = ['unknown'] + labels
 
-    if DEVICE == "cuda":
+    if DEVICE == torch.device(type="cuda"):
         num_workers = 1
         pin_memory = True
     else:
