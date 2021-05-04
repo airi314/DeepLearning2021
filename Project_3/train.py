@@ -16,8 +16,8 @@ def map_predictions(correct_index, predicted):
 def train_network(network,
                   train_loader, val_loader, correct_index, epochs=10,
                   criterion=None, optimizer=None,
-                  transforms_train=list(), transforms_val=list()
-                  ):
+                  transforms_train=list(), transforms_val=list(),
+                  print_results = False):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -61,9 +61,11 @@ def train_network(network,
                                  labels.reshape(-1, 1)).sum().item()
 
         training_loss = training_loss/size_train
-        print('Loss on validation set: ', training_loss)
+        if print_results:
+            print('Loss on training set: ', training_loss)
         training_accuracy = training_correct*100/size_train
-        print('Accuracy on training set: ', training_accuracy)
+        if print_results:
+            print('Accuracy on training set: ', training_accuracy)
 
         network.train_loss.append(training_loss)
         network.train_accuracy.append(training_accuracy)
@@ -81,8 +83,10 @@ def train_network(network,
                                        == np.array(labels)).sum()
 
         val_accuracy = validation_correct*100/size_val
-        print('Accuracy on validation set: ', val_accuracy)
-        print('-'*20)
+        if print_results:
+            print('Accuracy on validation set: ', val_accuracy)
+            print('-'*20)
+
         network.val_accuracy.append(val_accuracy)
 
         best_model = deepcopy(network.state_dict())
@@ -111,7 +115,7 @@ def evaluate_network(network, test_loader, correct_index):
             predicted = map_predictions(correct_index, predicted)
             test_correct += (np.array(predicted) == np.array(labels)).sum()
 
-    return test_correct*100/size_test
+    print('Accuracy o test set: ', test_correct*100/size_test)
 
 
 def get_predictions(network, test_loader, correct_index):
@@ -151,7 +155,6 @@ def plot_confusion_matrix(y_true, y_pred, correct_index, correct_labels = None):
     plt.figure(figsize=(10, 10))
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title('Confusion matrix')
-    plt.colorbar()
 
     if correct_labels is not None:
         tick_marks = np.arange(len(correct_labels))
