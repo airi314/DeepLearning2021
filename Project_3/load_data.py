@@ -8,12 +8,22 @@ import matplotlib.pyplot as plt
 from tqdm.notebook import tqdm
 from dataset import SPEECHCOMMANDS
 import numpy as np
-
+import random
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed + worker_id)
+    random.seed(worker_seed + worker_id)
+
 
 def load_data(root='data/train', batch_size=64):
+
+    random.seed(random_seed)
+    np.random.seed(random_seed)
+    torch.manual_seed(random_seed)
+    torch.backends.cudnn.deterministic=True
 
     # load and split data
     train_set = SPEECHCOMMANDS(root, subset='training')
@@ -42,6 +52,7 @@ def load_data(root='data/train', batch_size=64):
         collate_fn=lambda x: collate_fn(x, labels),
         num_workers=num_workers,
         pin_memory=pin_memory,
+        worker_init_fn=seed_worker
     )
 
     val_loader = torch.utils.data.DataLoader(
@@ -51,6 +62,7 @@ def load_data(root='data/train', batch_size=64):
         collate_fn=lambda x: collate_fn(x, labels),
         num_workers=num_workers,
         pin_memory=pin_memory,
+        worker_init_fn=seed_worker
     )
 
     test_loader = torch.utils.data.DataLoader(
@@ -60,6 +72,7 @@ def load_data(root='data/train', batch_size=64):
         collate_fn=lambda x: collate_fn(x, labels),
         num_workers=num_workers,
         pin_memory=pin_memory,
+        worker_init_fn=seed_worker
     )
 
     return (train_loader, val_loader, test_loader), labels
@@ -73,8 +86,6 @@ def pad_sequence(batch):
     return batch.permute(0, 2, 1)
 
 # prepare data
-
-
 def collate_fn(batch, labels_train):
     inputs, labels = [], []
     for waveform, _, label, *_ in batch:
