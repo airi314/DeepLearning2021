@@ -116,7 +116,7 @@ def evaluate_network(network, test_loader, correct_index):
             predicted = map_predictions(correct_index, predicted)
             test_correct += (np.array(predicted) == np.array(labels)).sum()
 
-    print('Accuracy o test set: ', test_correct*100/size_test)
+    return test_correct*100/size_test
 
 
 def get_predictions(network, test_loader, correct_index):

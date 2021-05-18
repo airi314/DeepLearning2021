@@ -58,7 +58,7 @@ def load_data(root='data/train', batch_size=64, random_seed=0):
     val_loader = torch.utils.data.DataLoader(
         valid_set,
         batch_size=batch_size,
-        shuffle=False,
+        shuffle=True,
         collate_fn=lambda x: collate_fn(x, labels),
         num_workers=num_workers,
         pin_memory=pin_memory,
@@ -68,7 +68,7 @@ def load_data(root='data/train', batch_size=64, random_seed=0):
     test_loader = torch.utils.data.DataLoader(
         test_set,
         batch_size=batch_size,
-        shuffle=False,
+        shuffle=True,
         collate_fn=lambda x: collate_fn(x, labels),
         num_workers=num_workers,
         pin_memory=pin_memory,
