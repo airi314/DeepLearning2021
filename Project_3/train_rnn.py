@@ -18,7 +18,8 @@ def train_network(network,
                   criterion=None, optimizer=None,
                   transforms_train=list(), transforms_val=list(),
                   print_results = False,
-                  random_seed = 0):
+                  random_seed = 0,
+                  print_classes = False):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -47,7 +48,9 @@ def train_network(network,
             labels = labels.to(device)
             
             #print('inputs.shape', inputs.shape)
-            #print('intputs[0]', inputs[0])
+            if print_classes:
+                print('Batch:', batch_idx)
+                print('Unique labels:', torch.unique(labels, sorted = True))
 
             for t in transforms_train:
                 inputs = t(inputs)
@@ -55,7 +58,6 @@ def train_network(network,
             optimizer.zero_grad()
             outputs = network(inputs)
             #print('outputs.shape', outputs.shape)
-            #print('outputs[0]', outputs[0])
 
             loss = criterion(outputs.squeeze(), labels)
             loss.backward()
@@ -64,13 +66,16 @@ def train_network(network,
 
             training_loss += loss.item() * inputs.size(0)
             predicted = torch.argmax(outputs.detach(), dim=1)
-            
+
+            if print_classes:
+                print('Unique predicted', torch.unique(predicted, sorted = True))
+
             training_correct += (predicted ==
                                  labels).sum().item()
             #print((predicted == labels).sum().item())
         training_loss = training_loss/size_train
         if print_results:
-            print('Loss on training set: ', training_loss)
+            print('\nLoss on training set: ', training_loss)
         training_accuracy = training_correct*100/size_train
         if print_results:
             print('Accuracy on training set: ', training_accuracy)
@@ -93,7 +98,7 @@ def train_network(network,
                 #print('val_cor', validation_correct)
         val_accuracy = validation_correct*100/size_val
         if print_results:
-            print('Accuracy on validation set: ', val_accuracy)
+            print('\nAccuracy on validation set: ', val_accuracy)
             print('-'*20)
 
         network.val_accuracy.append(val_accuracy)

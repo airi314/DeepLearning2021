@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -122,3 +123,24 @@ class M18(nn.Module):
         x = x.permute(0, 2, 1)
         x = self.fc1(x)
         return F.log_softmax(x, dim=2)
+
+
+class RNN(nn.Module):
+    def __init__(self, device, n_input=16000, n_hidden=16, n_layers=1, n_output=31):
+        super().__init__()
+        self.n_hidden = n_hidden
+        self.n_layers = n_layers
+        self.lstm = nn.LSTM(n_input, n_hidden, n_layers, batch_first=True)
+        self.fc = nn.Linear(n_hidden, n_output)
+        self.device = device
+
+    def forward(self, x):
+        # Set initial hidden and cell states
+        batch_size = x.size(0)
+        h0 = torch.zeros(self.n_layers, batch_size, self.n_hidden).to(self.device)
+        c0 = torch.zeros(self.n_layers, batch_size, self.n_hidden).to(self.device)
+
+        # Forward propagate LSTM
+        x, _ = self.lstm(x, (h0, c0))
+        x = self.fc(x[:, -1, :])
+        return F.log_softmax(x, dim=1)
