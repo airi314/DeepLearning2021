@@ -8,6 +8,7 @@ import torchvision.utils as torch_utils
 
 from tqdm import tqdm
 import os
+import numpy as np
 
 
 def load_data(data_path, data_transforms = None, batch_size = 64, image_size = 64):
@@ -50,8 +51,10 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir, pt_loss
 
     base_image = torch.randn(batch_size, 100, 1, 1).to(device)
 
-    discriminator.train()
+    d_loss_list = list()
+    g_loss_list = list()
 
+    discriminator.train()
 
     for epoch in tqdm(range(1, epochs+1)):
 
@@ -88,6 +91,9 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir, pt_loss
 
             iters = i + (epoch-1) * len(dataloader) + 1
 
+            d_loss_list.append(d_loss.item())
+            g_loss_list.append(g_loss.item())
+
         print("d_loss:", d_loss.item())
         print("g_loss:", g_loss.item(), iters)
 
@@ -101,3 +107,9 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir, pt_loss
 
         torch.save(generator.state_dict(), os.path.join(os.path.join(output_dir, 'weights'), f"Generator_epoch{epoch}.pth"))
         torch.save(discriminator.state_dict(), os.path.join(os.path.join(output_dir, 'weights'), f"Discriminator_epoch{epoch}.pth"))
+
+        d_loss_array = np.array(d_loss_list)
+        g_loss_array = np.array(g_loss_list)
+
+        np.save(os.path.join(output_dir, "d_loss.npy"), d_loss_array)
+        np.save(os.path.join(output_dir, "g_loss.npy"), g_loss_array)
