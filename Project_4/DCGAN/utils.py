@@ -103,4 +103,4 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir):
         g_loss_array = np.array(g_loss_list)
 
         np.save(os.path.join(output_dir, "d_loss.npy"), d_loss_array)
-        np.save(os.path.join(output_dir, "d_loss.npy"), d_loss_array)
+        np.save(os.path.join(output_dir, "g_loss.npy"), g_loss_array)
