@@ -42,6 +42,10 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir):
     optim_D = torch.optim.Adam(discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
 
     base_image = torch.randn(batch_size, 100, 1, 1).to(device)
+
+    d_loss_list = list()
+    g_loss_list = list()
+
     for epoch in tqdm(range(1, epochs+1)):
 
         discriminator.train()
@@ -77,6 +81,10 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir):
 
             iters = i + (epoch-1) * len(dataloader) + 1
 
+            d_loss_list.append(d_loss.item())
+            g_loss_list.append(g_loss.item())
+
+
         print("d_loss:", d_loss.item())
         print("g_loss:", g_loss.item(), iters)
 
@@ -90,3 +98,9 @@ def train_networks(dataloader, networks, batch_size, epochs, output_dir):
 
         torch.save(generator.state_dict(), os.path.join(os.path.join(output_dir, 'weights'), f"Generator_epoch{epoch}.pth"))
         torch.save(discriminator.state_dict(), os.path.join(os.path.join(output_dir, 'weights'), f"Discriminator_epoch{epoch}.pth"))
+
+        d_loss_array = np.array(d_loss_list)
+        g_loss_array = np.array(g_loss_list)
+
+        np.save(os.path.join(output_dir, "d_loss.npy"), d_loss_array)
+        np.save(os.path.join(output_dir, "d_loss.npy"), d_loss_array)
